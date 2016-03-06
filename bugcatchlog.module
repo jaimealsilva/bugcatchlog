@@ -18,8 +18,8 @@ function bugcatchlog_permission() {
 function bugcatchlog_menu() {
   return array(
     'admin/config/development/bugcatchlog' => array(
-      'title' => 'Configure BugCatch',
-      'description' => 'Configure access to Bug Catch service.',
+      'title' => 'BugCatch Logging',
+      'description' => 'Configure access to Bug Catch log service.',
       'access arguments' => array('config bugcatchlog'),
       'page callback' => 'drupal_get_form',
       'page arguments' => array('bugcatchlog_config_form'),
