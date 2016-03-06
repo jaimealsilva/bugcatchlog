@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function bugcatchlog_permission() {
+  return array(
+    'config bugcatchlog' => array(
+      'title' => t('Configure BugCatch.'),
+      'description' => t('Configure access to Bug Catch service.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function bugcatchlog_menu() {
+  return array(
+    'admin/config/bugcatchlog' => array(
+      'title' => 'Configure BugCatch',
+      'description' => 'Configure access to Bug Catch service.',
+      'access arguments' => array('config bugcatchlog'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => 'bugcatchlog_config_form',
+      'file' => 'bugcatchlog.pages.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_watchdog().
+ */
+function bugcatchlog_watchdog() {}

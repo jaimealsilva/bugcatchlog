@@ -1,0 +1,5 @@
+name = BugCatchLog
+description = Support for BugCatch Service (http://bugcatches.com/)
+package = BugCatch
+version = 7.x-0.1
+
