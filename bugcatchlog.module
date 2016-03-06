@@ -22,7 +22,7 @@ function bugcatchlog_menu() {
       'description' => 'Configure access to Bug Catch service.',
       'access arguments' => array('config bugcatchlog'),
       'page callback' => 'drupal_get_form',
-      'page arguments' => 'bugcatchlog_config_form',
+      'page arguments' => array('bugcatchlog_config_form'),
       'file' => 'bugcatchlog.pages.inc',
     ),
   );
