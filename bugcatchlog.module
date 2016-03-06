@@ -29,6 +29,20 @@ function bugcatchlog_menu() {
 }
 
 /**
+ * Utility function to read module configuration.
+ */
+function bugcatchlog_config($var) {
+  $defaults = array(
+    'service_url' => 'https://bugcatches.com/app_api.php/api/errors.json',
+    'service_key' => '',
+  );
+  if (!isset($defaults[$var])) {
+    return NULL;
+  }
+  return variable_get("bugcatchlog_$var", $defaults[$var]);
+}
+
+/**
  * Implements hook_watchdog().
  */
 function bugcatchlog_watchdog() {}
