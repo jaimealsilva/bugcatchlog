@@ -45,4 +45,120 @@ function bugcatchlog_config($var) {
 /**
  * Implements hook_watchdog().
  */
-function bugcatchlog_watchdog() {}
+function bugcatchlog_watchdog($log_entry) {
+  // Get Service data
+  $url = bugcatchlog_config('service_url');
+  $api_key = bugcatchlog_config('service_key');
+  if (!$url || !$key) {
+    return;
+  }
+  // Build user data
+  $user_data = bugcatchlog_user_data($log_entry['uid'], $log_entry['user']);
+  $user_data['ip'] = $log_entry['ip'];
+  // Encode errors
+  $errors = bugcatchlog_encode_errors($log_entry);
+  // Request data
+  $data = array(
+    'method' => $_SERVER['REQUEST_METHOD'],
+    'host' => $_SERVER['HTTP_HOST'],
+    'uri' => $log_entry['request_uri'],
+    'scheme' => $_SERVER['HTTPS'] ? 'https' : 'http',
+    'userData' => json_encode($user_data),
+    'post' => json_encode($_POST),
+    'get' => json_encode($_GET),
+    'cookie' => json_encode($_COOKIE),
+    'filesPost' => json_encode($_FILES),
+    'server' => json_encode($_SERVER),
+    'errors' => json_encode($errors),
+  );
+  // Headers --> Authentication
+  $headers = array(
+    'AUTHORIZATION' => $api_key,
+    'Content-Type' => 'application/x-www-form-urlencoded',
+  );
+  // Encode query
+  $urlencoded = drupal_http_build_query($data);
+  // Do request
+  drupal_http_request($url, array(
+    'headers' => $headers,
+    'method' => 'POST',
+    'data' => $urlencoded,
+  ));
+}
+
+/**
+ * Build user data.
+ */
+function bugcatchlog_user_data($uid, $account) {
+  $valid = !empty($account) && is_object($account);
+  return array(
+    'uid' => $uid,
+    'name' => !empty($account->name) ? $account->name : '',
+    'formatted_name' => format_username($account),
+  );
+}
+
+/**
+ * Encode errors from log entry.
+ */
+function bugcatchlog_encode_errors($log_entry) {
+  $errors = array();
+  $var = $log_entry['variables'];
+  // Drupal error log expected keys
+  $error_log_keys = array(
+    '%type',
+    '!message',
+    '%function',
+    '%file',
+    '%line',
+    'severity_level',
+  );
+  $diff = array_diff($error_log_keys, array_keys($var));
+  // If this is a system error log
+  if (empty($diff)) {
+    $error = array(
+      'message' => $var['!message'],
+      'code' => $var['%type'],
+      'file' => $var['%file'],
+      'line' => $var['%line'],
+      'severity' => bugcatchlog_encode_severity($var['severity_level']),
+    );
+    $trace = array();
+    // TODO: Split var[function] into class and method
+    $trace[] = array(
+      'namespace' => '',
+      'short_class' => '',
+      'class' => '',
+      'type' => '',
+      'function' => $var['%function'],
+      'file' => $var['%file'],
+      'line' => $var['%line'],
+      'args' => array(),
+      'lines_code' => '',
+    );
+    $error['traceJson'] = json_encode($trace);
+    $errors[] = $error;
+  }
+  // Log watchdog message
+  $error = array(
+    'message' => $log_entry['message'],
+    'code' => $log_entry['type'],
+    'file' => $log_entry['link'],
+    'line' => '',
+    'severity' => bugcatchlog_encode_severity($log_entry['severity']),
+    'traceJson' => NULL,
+  );
+  $errors[] = $error;
+  return $errors;
+}
+
+/**
+ * Turn a Drupal severity level (RFC 3164) into a human readable text.
+ */
+function bugcatchlog_encode_severity($level) {
+  $levels = watchdog_severity_levels();
+  if (isset($levels[$level])) {
+    return "{$levels[$level]}({$level})";
+  }
+  return NULL;
+}
