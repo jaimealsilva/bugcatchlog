@@ -17,7 +17,7 @@ function bugcatchlog_permission() {
  */
 function bugcatchlog_menu() {
   return array(
-    'admin/config/bugcatchlog' => array(
+    'admin/config/development/bugcatchlog' => array(
       'title' => 'Configure BugCatch',
       'description' => 'Configure access to Bug Catch service.',
       'access arguments' => array('config bugcatchlog'),
