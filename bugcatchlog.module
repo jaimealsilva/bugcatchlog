@@ -46,6 +46,7 @@ function bugcatchlog_config($var) {
  * Implements hook_watchdog().
  */
 function bugcatchlog_watchdog($log_entry) {
+  // TODO: This sould have queue support
   // Get Service data
   $url = bugcatchlog_config('service_url');
   $api_key = bugcatchlog_config('service_key');
@@ -140,8 +141,10 @@ function bugcatchlog_encode_errors($log_entry) {
     $errors[] = $error;
   }
   // Log watchdog message
+  $message = format_string($log_entry['message'], $var);
+  $message = drupal_html_to_text($message);
   $error = array(
-    'message' => format_string($log_entry['message'], $var),
+    'message' => $message,
     'code' => $log_entry['type'],
     'file' => $log_entry['link'],
     'line' => '',
