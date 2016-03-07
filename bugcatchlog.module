@@ -141,7 +141,7 @@ function bugcatchlog_encode_errors($log_entry) {
   }
   // Log watchdog message
   $error = array(
-    'message' => $log_entry['message'],
+    'message' => format_string($log_entry['message'], $var),
     'code' => $log_entry['type'],
     'file' => $log_entry['link'],
     'line' => '',
