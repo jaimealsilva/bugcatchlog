@@ -78,8 +78,8 @@ function bugcatchlog_watchdog($log_entry) {
   );
   // Encode query
   $urlencoded = drupal_http_build_query($data);
-  // Do request
-  drupal_http_request($url, array(
+  // Do request, $ans is used for debugging
+  $ans = drupal_http_request($url, array(
     'headers' => $headers,
     'method' => 'POST',
     'data' => $urlencoded,
