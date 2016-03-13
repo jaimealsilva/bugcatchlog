@@ -3,3 +3,6 @@ core = 7.x
 package = BugCatch
 description = Support for BugCatch Service (http://bugcatches.com/)
 version = 7.x-0.1
+files[] = lib/CULabsBugCatchPHP/Client/Client.php
+files[] = lib/CULabsBugCatchPHP/ErrorHandler/FlattenException.php
+files[] = lib/CULabsBugCatchPHP/ErrorHandler/ErrorHandler.php
