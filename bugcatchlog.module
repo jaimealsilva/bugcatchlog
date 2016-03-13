@@ -97,6 +97,7 @@ function bugcatchlog_load_libraries() {
 function bugcatchlog_build_exception($log_entry) {
   $errors = array();
   $var = $log_entry['variables'];
+  $severity = $log_entry['severity'];
   // Drupal error log expected keys
   $error_log_keys = array(
     '%type',
@@ -110,7 +111,7 @@ function bugcatchlog_build_exception($log_entry) {
   // If this is a system error log
   if (empty($diff)) {
     $file = drupal_realpath($var['%file']);
-    return new ErrorException($var['!message'], 0, $var['severity_level'], $file, $var['%line']);
+    return new ErrorException($var['!message'], $severity, $severity, $file, $var['%line']);
   }
   // Log watchdog message
   $message = format_string($log_entry['message'], $var);
@@ -118,5 +119,5 @@ function bugcatchlog_build_exception($log_entry) {
     $message .= " [{$log_entry['link']}]";
   }
   $message = drupal_html_to_text($message);
-  return new ErrorException($message, 0, $var['severity_level']);
+  return new ErrorException($message, $severity, $severity);
 }
