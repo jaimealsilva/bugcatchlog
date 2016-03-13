@@ -1,4 +1,6 @@
 <?php
+use CULabs\BugCatch\Client\Client;
+use CULabs\BugCatch\ErrorHandler\ErrorHandler;
 
 /**
  * Implements hook_permission().
@@ -47,6 +49,8 @@ function bugcatchlog_config($var) {
  */
 function bugcatchlog_watchdog($log_entry) {
   // TODO: This sould have queue support
+  // Load libraries
+  bugcatchlog_load_libraries();
   // Get Service data
   $url = bugcatchlog_config('service_url');
   $api_key = bugcatchlog_config('service_key');
@@ -54,8 +58,8 @@ function bugcatchlog_watchdog($log_entry) {
     return;
   }
   // Error handler
-  $client = new CULabs\BugCatch\Client\Client($url, $api_key);
-  $handler = new CULabs\BugCatch\ErrorHandler\ErrorHandler($client, TRUE);
+  $client = new Client($url, $api_key);
+  $handler = new ErrorHandler($client, TRUE);
   // Build user data
   $user_data = bugcatchlog_user_data($log_entry['uid'], $log_entry['user']);
   $user_data['ip'] = $log_entry['ip'];
@@ -79,9 +83,18 @@ function bugcatchlog_user_data($uid, $account) {
 }
 
 /**
+ * Load CatchLog libraries.
+ */
+function bugcatchlog_load_libraries() {
+  module_load_include('php', 'bugcatchlog', 'lib/CULabsBugCatchPHP/Client/Client');
+  module_load_include('php', 'bugcatchlog', 'lib/CULabsBugCatchPHP/ErrorHandler/FlattenException');
+  module_load_include('php', 'bugcatchlog', 'lib/CULabsBugCatchPHP/ErrorHandler/ErrorHandler');
+}
+
+/**
  * Build an ErrorException from log entry.
  */
-function bugcatchlog_encode_errors($log_entry) {
+function bugcatchlog_build_exception($log_entry) {
   $errors = array();
   $var = $log_entry['variables'];
   // Drupal error log expected keys
