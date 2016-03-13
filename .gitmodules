@@ -1,0 +1,4 @@
+[submodule "lib/CULabsBugCatchPHP"]
+	path = lib/CULabsBugCatchPHP
+	url = https://github.com/duvanmonsa/CULabsBugCatchPHP.git
+	branch = patch-1
