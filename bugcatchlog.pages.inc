@@ -25,6 +25,20 @@ function bugcatchlog_config_form($form, &$form_state) {
     '#default_value' => $key,
     '#required' => TRUE,
   );
+  $wd_severity_levels = watchdog_severity_levels();
+  // Format levels labels
+  $severity_levels = array();
+  foreach ($wd_severity_levels as $level => $label) {
+    $severity_levels[$level] = "[{$level}] " . drupal_ucfirst($label);
+  }
+  $level = bugcatchlog_config('max_severity');
+  $form['bugcatchlog_max_severity'] = array(
+    '#title' => t('Severity level'),
+    '#description' => t('Maximum severity level to report. All logs with this severity or lower will be reported'),
+    '#type' => 'radios',
+    '#options' => $severity_levels,
+    '#default_value' => $level,
+  );
   return system_settings_form($form);
 }
 

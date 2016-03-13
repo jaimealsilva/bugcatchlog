@@ -37,6 +37,7 @@ function bugcatchlog_config($var) {
   $defaults = array(
     'service_url' => 'https://bugcatches.com/app_api.php/api/errors.json',
     'service_key' => '',
+    'max_severity' => WATCHDOG_WARNING,
   );
   if (!isset($defaults[$var])) {
     return NULL;
@@ -49,14 +50,15 @@ function bugcatchlog_config($var) {
  */
 function bugcatchlog_watchdog($log_entry) {
   // TODO: This sould have queue support
-  // Load libraries
-  bugcatchlog_load_libraries();
   // Get Service data
   $url = bugcatchlog_config('service_url');
   $api_key = bugcatchlog_config('service_key');
-  if (!$url || !$api_key) {
+  $max_level = bugcatchlog_config('max_severity');
+  if ($log_entry['severity'] > $max_level || !$url || !$api_key) {
     return;
   }
+  // Load libraries
+  bugcatchlog_load_libraries();
   // Error handler
   $client = new Client($url, $api_key);
   $handler = new ErrorHandler($client, TRUE);
@@ -74,7 +76,10 @@ function bugcatchlog_watchdog($log_entry) {
  * Build user data.
  */
 function bugcatchlog_user_data($uid, $account) {
-  $valid = !empty($account) && is_object($account);
+  // It's not a good idea to send all user profile data since
+  // it could contain sensible information as ID numbers,
+  // address, real names, etc. This will send only the info
+  // needed by an administator to identify the user.
   return array(
     'uid' => $uid,
     'name' => !empty($account->name) ? $account->name : '',
